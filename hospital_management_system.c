@@ -109,6 +109,37 @@ typedef struct patient{
             remove("temp.txt");  // Cleanup temp file
         }
     }
+
+
+void available_doctor() {
+    doc d;
+    FILE *fp;
+
+    fp = fopen("doctor.txt", "rb"); 
+
+    char checkdate[10];
+    printf("Enter the date to check for doctor availability: ");
+    scanf("%s", checkdate);
+
+    int davailable=0; 
+
+
+    while (fread(&d, sizeof(d), 1, fp) == 1) {
+        if (strcmp(d.date, checkdate) == 0) {
+            
+            printf("Doctor %s is available on this date with specialization in %s.\n", d.dname, d.specialized);
+            davailable = 1;
+        }
+    }
+
+    
+    if (davailable == 0) {
+        printf("No doctor is available for the date %s.\n", checkdate);
+    }
+
+    fclose(fp); 
+}
+
     
     
 
