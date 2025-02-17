@@ -140,7 +140,103 @@ void available_doctor() {
     fclose(fp); 
 }
 
-    
+void patient_list()
+{
+        struct patient s;
+        FILE *fp;
+        fp=fopen("patient.txt","rb");
+        while(fread(&s,sizeof(s),1,fp)==1)
+        {
+            printf("ID: %d\n", s.id);
+            printf("Name: %s\n", s.pname);
+            printf("Age: %d\n", s.age);
+            printf("Gender: %s\n", s.gender);
+            printf("Address: %s\n", s.address);
+            printf("Symptoms: %s\n", s.symptomes);
+            printf("Checked by: %s\n", s.checkby_doctor);
+            printf("Date: %d/%d/%d\n", s.date[0], s.date[1], s.date[2]);
+            printf("\n");
+        }
+        fclose(fp);
+}
+
+void appointment()
+{   
+    int i=0;
+    int dokid;
+    struct doctor s[100];
+    printf("doctor is only available for 3 hours in this hospital 9:00-10:00, 10:00-11:00, 11:00-12:00\n");
+    printf("enter the doctor id:");
+    scanf("%d",&dokid);
+    FILE *fp;
+    fp=fopen("doctor.txt","rb+");
+    while(fread(&s,sizeof(s),1,fp)==1)
+    {   i++;
+        if(s->docid==dokid)
+        {
+            int choice;
+            printf("Doctor Name:%s\n",s->dname);
+            printf("Doctor Address:%s\n",s->docaddress);
+            printf("Doctor Specialized:%s\n",s->specialized);
+            printf("Doctor Date:%d/%d/%d\n",s->date[0],s->date[1],s->date[2]);
+            printf("enter the timinings you want to book the appointment:");
+            printf("1. 9:00-10:00\n");
+            printf("2. 10:00-11:00\n");
+            printf("3. 11:00-12:00\n");
+            scanf("%d",&choice);
+            if (choice < 1 || choice > 3) {
+                printf("Invalid choice!\n");
+                fclose(fp);
+            }
+            if(choice==1)
+            {
+                if(s->date[0]==0)
+                {
+                    s->date[0]=1;
+                    printf("Appointment booked successfully\n");
+                }
+                else
+                {
+                    printf("Appointment already booked\n");
+                }
+            }
+            if(choice==2)
+            {
+                if(s->date[1]==0)
+                {
+                    s->date[1]=1;
+                    printf("Appointment booked successfully\n");
+                }
+                else
+                {
+                    printf("Appointment already booked\n");
+                }
+            }
+            if(choice==3)
+            {
+                if(s->date[2]==0)
+                {
+                    s->date[2]=1;
+                    printf("Appointment booked successfully\n");
+                }
+                else
+                {
+                    printf("Appointment already booked\n");
+                }
+            }
+            fseek(fp,(i-1)*sizeof(s),SEEK_SET);
+            fwrite(&s,sizeof(s),1,fp);
+            fclose(fp);
+            break;
+
+
+        }
+        else
+        {
+            printf("Doctor not found\n");
+        }
+    }
+}
     
 
 
