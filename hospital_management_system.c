@@ -122,8 +122,8 @@ void available_doctor() {
     fp = fopen("doc_status.txt", "rb"); 
     
     printf("\n\t\t\t\tAvailable Doctor\n");
-    printf("----------------------------------------------------------\n");
-    printf("\t\tID\t\t\t|\t\tName\t\t|\t\tEntery time|\n");
+    printf("--------------------------------------------------------------------------------------------------\n");
+    printf("\t\tID\t\t\t|\t\tName\t\t|\t\tEntry time|\n");
     printf("----------------------------------------------------------\n");
     while(fread(&d, sizeof(d),1,fp)!=0){
         printf("\t\t%d\t\t\t|\t\t%s\t\t|\t\t%s|\n",d.docid,d.dname,d.date);
@@ -260,6 +260,20 @@ void add_doctor(){
     scanf("%d",&d.docid);
     fflush(stdin);
 
+    printf("\n Enter Doctor Name:\t");
+    fflush(stdin);
+    gets(d.dname);
+
+    printf("\n Enter Doctor Address:\t");
+    fflush(stdin);
+    gets(d.docaddress);
+
+    printf("\n Enter Doctor Specilization:\t");
+    fflush(stdin);
+    gets(d.specialized);
+
+
+
 }
 
 void doc_entry(){
@@ -280,7 +294,7 @@ void doc_entry(){
     scanf("%d",&d.docid);
     fflush(stdin);
 
-    printf("\n Enter doctor name");
+    printf("\n Enter doctor name:\t");
     fflush(stdin);
     gets(d.dname);
 
@@ -315,7 +329,7 @@ void doc_exit(){
     fclose(ft);
 
     if (f == 1) {
-        remove("doc_statust.txt");
+        remove("doc_status.txt");
         rename("temp1.txt", "doc_status.txt");
         printf("\n\nExit Granted.\n");
     } else {
