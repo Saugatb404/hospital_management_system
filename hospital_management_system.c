@@ -56,6 +56,10 @@ typedef struct patient{
         fflush(stdin);
         gets(p.gender);
 
+        printf("\nEnter Age:\t");
+        scanf("%d", &p.age);
+        fflush(stdin);
+
         
     
         printf("\nEnter Patient Address:\t ");
@@ -140,19 +144,22 @@ void available_doctor() {
 
 void patient_list()
 {
-        struct patient s;
+        patient p;
         FILE *fp;
         fp=fopen("patient.txt","rb");
-        while(fread(&s,sizeof(s),1,fp)==1)
+        printf("\n\t\t\t\tPatient List\n");
+        printf("--------------------------------------------------------------------------------------------------\n");
+        printf("\nID\t|\tName\t|\tAge\t|\tGender\t|\tAddress\t|\tsymptomes\t\t|\t\tChecked By\t|\tAdmit Date\n");
+        while(fread(&p,sizeof(p),1,fp)==1)
         {
-            printf("ID: %d\n", s.id);
-            printf("Name: %s\n", s.pname);
-            printf("Age: %d\n", s.age);
-            printf("Gender: %s\n", s.gender);
-            printf("Address: %s\n", s.address);
-            printf("Symptoms: %s\n", s.symptomes);
-            printf("Checked by: %s\n", s.checkby_doctor);
-            printf("Date: %d/%d/%d\n", s.date[0], s.date[1], s.date[2]);
+            printf("%d", p.id);
+            printf("\t|\t%s", p.pname);
+            printf("\t|\t%d", p.age);
+            printf("\t|\t%s", p.gender);
+            printf("\t|\t%s", p.address);
+            printf("\t\t|\t\t%s", p.symptomes);
+            printf("\t|\t%s", p.checkby_doctor);
+            printf("\t|\t%s",p.date);
             printf("\n");
         }
         fclose(fp);
