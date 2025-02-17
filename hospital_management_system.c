@@ -315,12 +315,12 @@ void doc_exit(){
     fclose(ft);
 
     if (f == 1) {
-        remove("patient.txt");
-        rename("temp.txt", "patient.txt");
-        printf("\n\nPatient Discharged Successfully.\n");
+        remove("doc_statust.txt");
+        rename("temp1.txt", "doc_status.txt");
+        printf("\n\nExit Granted.\n");
     } else {
-        printf("\n\nRecord Not Found!\n");
-        remove("temp.txt");  // Cleanup temp file
+        printf("\n\nNo entry Found!\n");
+        remove("temp1.txt");  // Cleanup temp file
     }
 }
 
