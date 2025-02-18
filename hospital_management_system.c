@@ -6,6 +6,7 @@
 
 FILE *fp;
 
+//structue part 
 typedef struct patient{
     int id;
     char pname[20];
@@ -23,6 +24,9 @@ typedef struct patient{
 
     }doc;
 
+    
+
+    // sub function part
 
     void admit_patient(){
         
@@ -36,7 +40,7 @@ typedef struct patient{
         strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", time_info); // localtime():Converts the time to the local time zone. converts the time in human readable formate
         //strftime: . converts the time in human readable formate
         
-        strcpy(p.date, buffer);
+        strcpy(p.date, buffer);     // copy the string value of p.date into buffer
 
 
         fp = fopen("patient.txt", "ab");
@@ -51,6 +55,10 @@ typedef struct patient{
         printf("\nEnter Patient gender: \t");
         fflush(stdin);
         gets(p.gender);
+
+        printf("\nEnter Age:\t");
+        scanf("%d", &p.age);
+        fflush(stdin);
 
         
     
@@ -115,46 +123,43 @@ void available_doctor() {
     doc d;
     FILE *fp;
 
-    fp = fopen("doctor.txt", "rb"); 
-
-    char checkdate[10];
-    printf("Enter the date to check for doctor availability: ");
-    scanf("%s", checkdate);
-
-    int davailable=0; 
-
-
-    while (fread(&d, sizeof(d), 1, fp) == 1) {
-        if (strcmp(d.date, checkdate) == 0) {
-            
-            printf("Doctor %s is available on this date with specialization in %s.\n", d.dname, d.specialized);
-            davailable = 1;
-        }
-    }
-
+    fp = fopen("doc_status.txt", "rb"); 
     
-    if (davailable == 0) {
-        printf("No doctor is available for the date %s.\n", checkdate);
+    printf("\n\t\t\t\tAvailable Doctor\n");
+    printf("--------------------------------------------------------------------------------------------------\n");
+    printf("\t\tID\t\t\t|\t\tName\t\t|\t\tEntry time|\n");
+    printf("----------------------------------------------------------\n");
+    while(fread(&d, sizeof(d),1,fp)!=0){
+        printf("\t\t%d\t\t\t|\t\t%s\t\t|\t\t%s|\n",d.docid,d.dname,d.date);
+
     }
+
+    fclose(fp);
+
+
+ 
 
     fclose(fp); 
 }
 
 void patient_list()
 {
-        struct patient s;
+        patient p;
         FILE *fp;
         fp=fopen("patient.txt","rb");
-        while(fread(&s,sizeof(s),1,fp)==1)
+        printf("\n\t\t\t\tPatient List\n");
+        printf("--------------------------------------------------------------------------------------------------\n");
+        printf("\nID\t|\tName\t|\tAge\t|\tGender\t|\tAddress\t|\tsymptomes\t\t|\t\tChecked By\t|\tAdmit Date\n");
+        while(fread(&p,sizeof(p),1,fp)==1)
         {
-            printf("ID: %d\n", s.id);
-            printf("Name: %s\n", s.pname);
-            printf("Age: %d\n", s.age);
-            printf("Gender: %s\n", s.gender);
-            printf("Address: %s\n", s.address);
-            printf("Symptoms: %s\n", s.symptomes);
-            printf("Checked by: %s\n", s.checkby_doctor);
-            printf("Date: %d/%d/%d\n", s.date[0], s.date[1], s.date[2]);
+            printf("%d", p.id);
+            printf("\t|\t%s", p.pname);
+            printf("\t|\t%d", p.age);
+            printf("\t|\t%s", p.gender);
+            printf("\t|\t%s", p.address);
+            printf("\t\t|\t\t%s", p.symptomes);
+            printf("\t|\t%s", p.checkby_doctor);
+            printf("\t|\t%s",p.date);
             printf("\n");
         }
         fclose(fp);
@@ -239,6 +244,115 @@ void appointment()
 }
     
 
+void add_doctor(){
+    FILE *fp;
+    doc d;
+
+    // for current date 
+    time_t t;
+        struct tm *time_info;
+        char buffer[20];
+        time(&t);
+        time_info = localtime(&t);
+        strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", time_info); 
+        
+        strcpy(d.date, buffer);
+
+
+
+    
+    fp=fopen("doctor.txt","ab"); // open the file doctor.txt in binary append mode
+
+    printf("\nNew doctor ID:\t");
+    scanf("%d",&d.docid);
+    fflush(stdin);
+
+    printf("\n Enter Doctor Name:\t");
+    fflush(stdin);
+    gets(d.dname);
+
+    printf("\n Enter Doctor Address:\t");
+    fflush(stdin);
+    gets(d.docaddress);
+
+    printf("\n Enter Doctor Specilization:\t");
+    fflush(stdin);
+    gets(d.specialized);
+
+    printf("\n doctor appintment time:\t");
+    d.date[0]=0;
+    d.date[1]=0;
+    d.date[2]=0;
+
+    fwrite(&d, sizeof(d),1,fp);
+
+
+
+
+}
+
+void doc_entry(){
+    doc d;
+    fp = fopen("doc_status.txt","ab");
+
+    time_t t;
+    struct tm *time_info;
+    char buffer[20];
+    time(&t);
+    time_info = localtime(&t);
+    strftime(buffer, sizeof(buffer), "%d %H:%M:%S", time_info); 
+    strcpy(d.date, buffer);
+
+
+
+    printf("\n enter your id:\t");
+    scanf("%d",&d.docid);
+    fflush(stdin);
+
+    printf("\n Enter doctor name:\t");
+    fflush(stdin);
+    gets(d.dname);
+
+    fwrite(&d, sizeof(d),1,fp);
+    fclose(fp);
+    printf("\n Entry varified\n");
+}
+
+
+
+void doc_exit(){
+    doc d;
+    int id,f;
+    printf("\n enter your id:\t");
+    scanf("%d",&id);
+    fflush(stdin);
+    FILE *fp, *ft;  // Declare file pointers locally
+    
+    fp = fopen("doc_status.txt", "rb");
+
+    ft = fopen("temp1.txt", "wb");
+
+    while (fread(&d, sizeof(d), 1, fp) == 1) {
+        if (id == d.docid) {
+            f = 1;  // Found the patient, but don't write it to new file
+        } else {
+            fwrite(&d, sizeof(d), 1, ft);
+        }
+    }
+
+    fclose(fp);
+    fclose(ft);
+
+    if (f == 1) {
+        remove("doc_status.txt");
+        rename("temp1.txt", "doc_status.txt");
+        printf("\n\nExit Granted.\n");
+    } else {
+        printf("\n\nNo entry Found!\n");
+        remove("temp1.txt");  // Cleanup temp file
+    }
+}
+
 
 int main(){
 
@@ -253,6 +367,8 @@ int main(){
         printf("\t4. Available Doctor\n");
         printf("\t5. Add Doctor\n");
         printf("\t6. Appointment\n");
+        printf("\t7. Doctor Entry\n");
+        printf("\t8. Doctor Exit\n");
         printf("\t0. Exit\n");
         printf("\n------------------------------------------------------");
         printf("\nEnter your choice :\t");
@@ -279,6 +395,12 @@ int main(){
             case 6:
             	appointment();
             	break;
+            case 7:
+                doc_entry();
+                break;
+            case 8:
+                doc_exit();
+                break;
             case 0:
                 printf("Exiting program...\n");
                 exit(0); 
