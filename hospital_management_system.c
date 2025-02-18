@@ -165,131 +165,116 @@ void patient_list()
         fclose(fp);
 }
 
-void appointment()
-{   
-    int i=0;
-    int dokid;
-    struct doctor s[100];
-    printf("doctor is only available for 3 hours in this hospital 9:00-10:00, 10:00-11:00, 11:00-12:00\n");
-    printf("enter the doctor id:");
-    scanf("%d",&dokid);
-    FILE *fp;
-    fp=fopen("doctor.txt","rb+");
-    while(fread(&s,sizeof(s),1,fp)==1)
-    {   i++;
-        if(s->docid==dokid)
-        {
-            int choice;
-            printf("Doctor Name:%s\n",s->dname);
-            printf("Doctor Address:%s\n",s->docaddress);
-            printf("Doctor Specialized:%s\n",s->specialized);
-            printf("Doctor Date:%d/%d/%d\n",s->date[0],s->date[1],s->date[2]);
-            printf("enter the timinings you want to book the appointment:");
+int appointment() {   
+    int i = 0, dokid, choice, found = 0;
+    doc s;
+
+    printf("Doctors are only available for 3 hours in this hospital:\n");
+    printf("1. 9:00-10:00\n");
+    printf("2. 10:00-11:00\n");
+    printf("3. 11:00-12:00\n");
+
+    printf("Enter the doctor ID: ");
+    scanf("%d", &dokid);
+
+    FILE *fp = fopen("doctor.txt", "rb+");
+
+    if (fp == NULL) {
+        printf("Error: Could not open doctor.txt\n");
+        return;
+    }
+
+    while (fread(&s, sizeof(s), 1, fp) == 1) {
+        if (s.docid == dokid) {
+            found = 1;
+
+            printf("Doctor Name: %s\n", s.dname);
+            printf("Doctor Address: %s\n", s.docaddress);
+            printf("Doctor Specialized: %s\n", s.specialized);
+            printf("Doctor Availability: %d/%d/%d\n", s.date[0], s.date[1], s.date[2]);
+
+            printf("Enter the timing you want to book:\n");
             printf("1. 9:00-10:00\n");
             printf("2. 10:00-11:00\n");
             printf("3. 11:00-12:00\n");
-            scanf("%d",&choice);
+            scanf("%d", &choice);
+
             if (choice < 1 || choice > 3) {
                 printf("Invalid choice!\n");
                 fclose(fp);
+                return;
             }
-            if(choice==1)
-            {
-                if(s->date[0]==0)
-                {
-                    s->date[0]=1;
-                    printf("Appointment booked successfully\n");
-                }
-                else
-                {
-                    printf("Appointment already booked\n");
-                }
+
+            if (s.date[choice - 1] == 0) {
+                s.date[choice - 1] = 1;
+                printf("Appointment booked successfully\n");
+            } else {
+                printf("Appointment already booked\n");
+                fclose(fp);
+                return 0;
             }
-            if(choice==2)
-            {
-                if(s->date[1]==0)
-                {
-                    s->date[1]=1;
-                    printf("Appointment booked successfully\n");
-                }
-                else
-                {
-                    printf("Appointment already booked\n");
-                }
-            }
-            if(choice==3)
-            {
-                if(s->date[2]==0)
-                {
-                    s->date[2]=1;
-                    printf("Appointment booked successfully\n");
-                }
-                else
-                {
-                    printf("Appointment already booked\n");
-                }
-            }
-            fseek(fp,(i-1)*sizeof(s),SEEK_SET);
-            fwrite(&s,sizeof(s),1,fp);
-            fclose(fp);
+
+            fseek(fp, -sizeof(s), SEEK_CUR);
+            fwrite(&s, sizeof(s), 1, fp);
             break;
-
-
-        }
-        else
-        {
-            printf("Doctor not found\n");
         }
     }
+
+    fclose(fp);
+
+    if (!found) {
+        printf("Doctor not found\n");
+    }
 }
+
     
 
-void add_doctor(){
+void add_doctor() {
     FILE *fp;
     doc d;
 
-    // for current date 
+    // Get current date & time
     time_t t;
-        struct tm *time_info;
-        char buffer[20];
-        time(&t);
-        time_info = localtime(&t);
-        strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", time_info); 
-        
-        strcpy(d.date, buffer);
+    struct tm *time_info;
+    char buffer[20];
+    time(&t);
+    time_info = localtime(&t);
+    strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", time_info);
 
+    fp = fopen("doctor.txt", "ab");
 
+    if (fp == NULL) {
+        printf("Error: Could not open doctor.txt\n");
+        return;
+    }
 
-    
-    fp=fopen("doctor.txt","ab"); // open the file doctor.txt in binary append mode
+    printf("\nNew Doctor ID:\t");
+    scanf("%d", &d.docid);
+    getchar(); // Clear newline from buffer
 
-    printf("\nNew doctor ID:\t");
-    scanf("%d",&d.docid);
-    fflush(stdin);
+    printf("\nEnter Doctor Name:\t");
+    scanf("%[^\n]", d.dname);
+    getchar();
 
-    printf("\n Enter Doctor Name:\t");
-    fflush(stdin);
-    gets(d.dname);
+    printf("\nEnter Doctor Address:\t");
+    scanf("%[^\n]", d.docaddress);
+    getchar();
 
-    printf("\n Enter Doctor Address:\t");
-    fflush(stdin);
-    gets(d.docaddress);
+    printf("\nEnter Doctor Specialization:\t");
+    scanf("%[^\n]", d.specialized);
+    getchar();
 
-    printf("\n Enter Doctor Specilization:\t");
-    fflush(stdin);
-    gets(d.specialized);
+    // Initialize appointment slots
+    d.date[0] = 0; // 9:00-10:00
+    d.date[1] = 0; // 10:00-11:00
+    d.date[2] = 0; // 11:00-12:00
 
-    printf("\n doctor appintment time:\t");
-    d.date[0]=0;
-    d.date[1]=0;
-    d.date[2]=0;
+    fwrite(&d, sizeof(d), 1, fp);
+    fclose(fp);
 
-    fwrite(&d, sizeof(d),1,fp);
-
-
-
-
+    printf("\nDoctor added successfully!\n");
 }
+
 
 void doc_entry(){
     doc d;
